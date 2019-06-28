@@ -1,18 +1,21 @@
 import React from "react"
 import { graphql } from "gatsby"
 
-const Index = ({ data }) => (
-  <div>
-    <h1>My repositories</h1>
+const Index = ({ data }) => {
+  console.log(data)
+  return (
     <div>
-      {data.github.user.pinnedItems.nodes.map((repository, i) => (
-        <div key={i}>
-          <h2>{repository.name}</h2>
-        </div>
-      ))}
+      <h1>{data.github.user.name}</h1>
+      <div>
+        {data.github.user.pinnedItems.nodes.map((repository, i) => (
+          <div key={i}>
+            <h2>{repository.name}</h2>
+          </div>
+        ))}
+      </div>
     </div>
-  </div>
-)
+  )
+}
 
 export default Index
 
