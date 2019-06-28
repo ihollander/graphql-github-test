@@ -1,9 +1,35 @@
-/**
- * Configure your Gatsby site with this file.
- *
- * See: https://www.gatsbyjs.org/docs/gatsby-config/
- */
+const fs = require(`fs`)
+const fetch = require(`node-fetch`)
+const { buildClientSchema } = require(`graphql`)
+const { createHttpLink } = require(`apollo-link-http`)
+require(`dotenv`).config({
+  path: `.env.${process.env.NODE_ENV}`,
+})
 
 module.exports = {
-  /* Your site config here */
+  plugins: [
+    {
+      resolve: `gatsby-source-graphql`,
+      options: {
+        fieldName: `github`,
+        typeName: `GitHub`,
+        createLink: () =>
+          createHttpLink({
+            uri: `https://api.github.com/graphql`,
+            headers: {
+              Authorization: `bearer ${process.env.GITHUB_TOKEN}`,
+            },
+            fetch,
+          }),
+        createSchema: async () => {
+          // requires latest GraphQL schema
+          // curl -H "Authorization: bearer token" https://api.github.com/graphql -o github-schema.json
+          const json = JSON.parse(
+            fs.readFileSync(`${__dirname}/github-schema.json`)
+          )
+          return buildClientSchema(json.data)
+        },
+      },
+    },
+  ],
 }
